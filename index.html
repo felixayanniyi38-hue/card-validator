@@ -8,82 +8,94 @@
 <style>
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #0f172a, #1e293b);
-  color: white;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+  background: radial-gradient(circle at top, #1e293b, #0f172a);
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-}
-.valid {
-  color: #22c55e;
-  text-shadow: 0 0 10px #22c55e;
+  color: white;
 }
 
-.invalid {
-  color: #ef4444;
-}
-  
-.card {
-  width: 360px;
-  background: rgba(255,255,255,0.05);
+/* MAIN CARD */
+.container {
+  width: 380px;
+  background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 15px;
+  border-radius: 18px;
   padding: 25px;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
   text-align: center;
 }
 
+/* TITLE */
 h1 {
-  margin-bottom: 5px;
   font-size: 22px;
+  margin-bottom: 5px;
 }
 
-p.subtitle {
+.sub {
   font-size: 12px;
   color: #94a3b8;
   margin-bottom: 20px;
 }
 
-input {
-  width: 100%;
-  padding: 12px;
-  border-radius: 8px;
-  border: none;
-  outline: none;
-  margin-bottom: 12px;
-  font-size: 14px;
+/* ICONS */
+.icons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 15px;
 }
 
+.icons img {
+  width: 55px;
+  opacity: 0.2;
+  filter: grayscale(100%);
+  transition: 0.3s;
+}
+
+.icons img.active {
+  opacity: 1;
+  filter: none;
+  transform: scale(1.1);
+}
+
+/* INPUT */
+input {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+/* BUTTON */
 button {
   width: 100%;
-  padding: 12px;
-  background: #22c55e;
+  padding: 14px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #22c55e, #16a34a);
   color: white;
   font-weight: bold;
   cursor: pointer;
 }
 
 button:hover {
-  background: #16a34a;
+  transform: scale(1.02);
 }
 
+/* RESULT */
 .result {
   margin-top: 15px;
   font-weight: bold;
 }
 
-.loading {
-  display: none;
-  margin-top: 10px;
-  font-size: 12px;
-  color: #cbd5e1;
-}
-
+/* FOOTER */
 .footer {
   margin-top: 15px;
   font-size: 10px;
@@ -94,72 +106,73 @@ button:hover {
 
 <body>
 
-<div class="card">
+<div class="container">
+
   <h1>CardVerify</h1>
-  <p class="subtitle">Secure Card Number Validator</p>
+  <div class="sub">Secure Card Validation Tool</div>
+
+  <div class="icons">
+    <img id="visa" src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg">
+    <img id="mastercard" src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg">
+  </div>
 
   <input type="text" id="cardNumber" placeholder="Enter card number">
 
-  <button onclick="validateCard()">Validate</button>
-
-  <div class="loading" id="loading">Checking card...</div>
+  <button onclick="validateCard()">Validate Card</button>
 
   <div class="result" id="result"></div>
 
   <div class="footer">
-    This tool only checks card number structure. No data is stored or transmitted.
+    Educational tool only. No data is stored or transmitted.
   </div>
+
 </div>
 
 <script>
-function validateCard() {
-  let num = document.getElementById("cardNumber").value.replace(/\s/g, "");
-  let result = document.getElementById("result");
-  let loading = document.getElementById("loading");
-if (isValid) {
-  result.className = "result valid";
-} else {
-  result.className = "result invalid";
-}
-  if (!num) {
-    result.innerHTML = "Please enter a card number";
-    return;
-  }
 document.getElementById("cardNumber").addEventListener("input", function(e) {
   let value = e.target.value.replace(/\D/g, "").substring(0,16);
   let formatted = value.match(/.{1,4}/g);
   e.target.value = formatted ? formatted.join(" ") : value;
 });
-  result.innerHTML = "";
-  loading.style.display = "block";
 
-  setTimeout(() => {
-    let sum = 0;
-    let shouldDouble = false;
+function validateCard() {
+  let num = document.getElementById("cardNumber").value.replace(/\s/g, "");
+  let result = document.getElementById("result");
 
-    for (let i = num.length - 1; i >= 0; i--) {
-      let digit = parseInt(num[i]);
+  // reset icons
+  document.getElementById("visa").classList.remove("active");
+  document.getElementById("mastercard").classList.remove("active");
 
-      if (shouldDouble) {
-        digit *= 2;
-        if (digit > 9) digit -= 9;
-      }
+  let sum = 0;
+  let shouldDouble = false;
 
-      sum += digit;
-      shouldDouble = !shouldDouble;
+  for (let i = num.length - 1; i >= 0; i--) {
+    let digit = parseInt(num[i]);
+
+    if (shouldDouble) {
+      digit *= 2;
+      if (digit > 9) digit -= 9;
     }
 
-    let isValid = (sum % 10 === 0);
+    sum += digit;
+    shouldDouble = !shouldDouble;
+  }
 
-    let type = "Unknown";
-    if (/^4/.test(num)) type = "Visa";
-    else if (/^5[1-5]/.test(num)) type = "MasterCard";
-    else if (/^3[47]/.test(num)) type = "American loading.innerText = "🔍 Checking card...";
-loading.innerText = "🔍 Checking card...";
-    result.innerHTML = isValid
-      ? `✅ Valid Card<br><small>${type}</small>`
-      : `❌ Invalid Card`;
-  }, 1200);
+  let isValid = (sum % 10 === 0);
+
+  let type = "Unknown";
+  if (/^4/.test(num)) {
+    type = "Visa";
+    document.getElementById("visa").classList.add("active");
+  }
+  else if (/^5[1-5]/.test(num)) {
+    type = "MasterCard";
+    document.getElementById("mastercard").classList.add("active");
+  }
+
+  result.innerHTML = isValid
+    ? `✅ Valid Card <br><small>${type}</small>`
+    : `❌ Invalid Card`;
 }
 </script>
 
