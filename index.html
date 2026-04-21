@@ -16,7 +16,15 @@ body {
   align-items: center;
   height: 100vh;
 }
+.valid {
+  color: #22c55e;
+  text-shadow: 0 0 10px #22c55e;
+}
 
+.invalid {
+  color: #ef4444;
+}
+  
 .card {
   width: 360px;
   background: rgba(255,255,255,0.05);
@@ -108,12 +116,20 @@ function validateCard() {
   let num = document.getElementById("cardNumber").value.replace(/\s/g, "");
   let result = document.getElementById("result");
   let loading = document.getElementById("loading");
-
+if (isValid) {
+  result.className = "result valid";
+} else {
+  result.className = "result invalid";
+}
   if (!num) {
     result.innerHTML = "Please enter a card number";
     return;
   }
-
+document.getElementById("cardNumber").addEventListener("input", function(e) {
+  let value = e.target.value.replace(/\D/g, "").substring(0,16);
+  let formatted = value.match(/.{1,4}/g);
+  e.target.value = formatted ? formatted.join(" ") : value;
+});
   result.innerHTML = "";
   loading.style.display = "block";
 
@@ -138,12 +154,10 @@ function validateCard() {
     let type = "Unknown";
     if (/^4/.test(num)) type = "Visa";
     else if (/^5[1-5]/.test(num)) type = "MasterCard";
-    else if (/^3[47]/.test(num)) type = "American Express";
-
-    loading.style.display = "none";
-
+    else if (/^3[47]/.test(num)) type = "American loading.innerText = "🔍 Checking card...";
+loading.innerText = "🔍 Checking card...";
     result.innerHTML = isValid
-      ? `✅ Valid Card<br>Type: ${type}`
+      ? `✅ Valid Card<br><small>${type}</small>`
       : `❌ Invalid Card`;
   }, 1200);
 }
