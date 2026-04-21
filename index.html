@@ -85,7 +85,7 @@ button {
   cursor: pointer;
 }
 
-button:hover {
+<button:hover {
   transform: scale(1.02);
 }
 
@@ -137,11 +137,13 @@ document.getElementById("cardNumber").addEventListener("input", function(e) {
 
 function validateCard() {
   let num = document.getElementById("cardNumber").value.replace(/\s/g, "");
+
   let result = document.getElementById("result");
 
-  // reset icons
-  document.getElementById("visa").classList.remove("active");
-  document.getElementById("mastercard").classList.remove("active");
+  if (!num || isNaN(num)) {
+    result.innerHTML = "❌ Enter a valid number";
+    return;
+  }
 
   let sum = 0;
   let shouldDouble = false;
@@ -160,24 +162,13 @@ function validateCard() {
 
   let isValid = (sum % 10 === 0);
 
-  let let type = "Unknown";
-
-if (/^4/.test(num)) {
-  type = "Visa";
-}
-else if (/^5[1-5]/.test(num)) {
-  type = "MasterCard";
-}
-else if (/^3[47]/.test(num)) {
-  type = "American Express";
-}
-else if (/^6/.test(num)) {
-  type = "Discover";
-}
-  }
+  let type = "Unknown";
+  if (/^4/.test(num)) type = "Visa";
+  else if (/^5[1-5]/.test(num)) type = "MasterCard";
+  else if (/^3[47]/.test(num)) type = "American Express";
 
   result.innerHTML = isValid
-    ? `✅ Valid Card <br><small>${type}</small>`
+    ? `✅ Valid Card<br><small>${type}</small>`
     : `❌ Invalid Card`;
 }
 </script>
