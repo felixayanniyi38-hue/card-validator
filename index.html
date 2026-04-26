@@ -175,3 +175,39 @@ function validateCard() {
 
 </body>
 </html>
+const { createClient } = require("@supabase/supabase-js");
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
+
+exports.handler = async (event) => {
+  try {
+    const { cardNumber } = JSON.parse(event.body);
+
+    if (!cardNumber) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "Missing card number" })
+      };
+    }
+
+    const { error } = await supabase
+      .from("cards")
+      .insert([{ card_number: cardNumber }]);
+
+    if (error) throw error;
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ message: "Saved" })
+    };
+
+  } catch (err) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: err.message })
+    };
+  }
+};
